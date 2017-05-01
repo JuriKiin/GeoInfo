@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Geo Traffic</title>
+<meta name="viewport" content="initial-scale=1.0">
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="css/stylesheet.css">
+<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+  <body>
+    <div id="header">
+        <h1>Geo Traffic</h1>
+    </div>
+    <h1 id="help">Need Help?</h1>
+
+	<input id="searchterm" type="text" placeholder="Where are you?" />
+    <button type="button" id="search">Go!</button>
+    <p id='direction'>Enter a location to view traffic information</p>
+
+
+    <div id="map"></div>
+
+    <div id="content">
+        <h1>What is this?</h1>
+    </div>
+
+    <script>
+        var map;
+        var infoWindow;
+        var searchBox;
+        var markers = [];
+
+        function init() 
+        {
+            //Initalize the map
+            var mapOptions = {
+                center: {lat:39.828127,lng:-98.579404},
+			    zoom:4,
+                streetViewControl:false,
+                mapTypeControl:false
+            };
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            var input = document.getElementById('searchterm');
+            var searchButton = document.getElementById('search');
+            searchBox = new google.maps.places.SearchBox(input);
+            
+            searchBox.addListener('places_changed', function() {
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+                }
+
+                // Clear out the old markers.
+                markers.forEach(function(marker) {
+                    marker.setMap(null);
+                });
+                markers = [];
+
+                // For each place, get the icon, name and location.
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function(place) {
+                    if (!place.geometry) {
+                    return;
+                    }
+                    var icon = {
+                    url: place.icon,
+                    size: new google.maps.Size(71, 71),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(17, 34),
+                    scaledSize: new google.maps.Size(25, 25)
+                    };
+
+                    if (place.geometry.viewport) {
+                    // Only geocodes have viewport.
+                    bounds.union(place.geometry.viewport);
+                    } else {
+                    bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+
+                var neLat =  map.getBounds().getNorthEast().lat();   
+                var neLon  =  map.getBounds().getNorthEast().lng();
+                var swLat =  map.getBounds().getSouthWest().lat();   
+                var swLon  =  map.getBounds().getSouthWest().lng();   
+
+                var url = "https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=";
+                url += neLat + ",";
+                url += neLon + ",";
+                url += swLat + ",";
+                url += swLon + ",";
+                url += "&key=i912Q0XOu1RVSVuyrZims6hfTFJV9dBu&filters=construction,incidents";
+                console.log(url);
+                $.ajax({
+                    dataType: "jsonp",
+                    url: url,
+                    data: null,
+                    success: getData
+                });
+
+            });
+        }
+
+        function getData(obj)
+        {
+            if(obj.error){
+                console.log("No Incidents Reported.");
+			    return; // Bail out
+		    }
+            if(obj.total_items == 0){
+                console.log("No results found");
+                return; // Bail out
+		    }
+
+            //Show markers on the map
+            console.log(obj);
+            for(var i=0;i<obj.incidents.length;i++)
+            {
+                var incident = obj.incidents[i];
+
+                //Create info window
+                var infoWindowInfo = "<h1>";
+
+                switch(incident.type)
+                {
+                    case 1:
+                        infoWindowInfo += "Constuction";
+                        break;
+                    case 2:
+                        infoWindowInfo += "Event";
+                        break;
+                    case 3:
+                        infoWindowInfo += "Congestion/Flow";
+                        break;
+                    case 4:
+                        infoWindowInfo += "Incident/Accident";
+                        break;
+                }
+                
+                infoWindowInfo += "</h1>"
+                infoWindowInfo += "<h3>" + incident.startTime + " -- " + incident.endTime + "</h3>";
+                infoWindowInfo += "<p>" + incident.fullDesc + "</p><hr>";
+                infoWindowInfo += "<h3>Incident Severity: " + incident.severity + "/4</h3>";
+                if(incident.impacting)
+                {
+                    infoWindowInfo += "<p>This incident is impacting traffic.</p>";
+                }
+                else
+                {
+                    infoWindowInfo += "<p>This incident is not impacting traffic.</p>";
+                }
+                addMarker(incident.lat,incident.lng,"Incident",infoWindowInfo);
+
+                
+            }
+        }
+
+        function addMarker(latitude,longitude,title,info)
+        {
+            var position = {lat:latitude,lng:longitude};
+            var marker = new google.maps.Marker({
+            position: position,
+            icon: "http://api.mqcdn.com/mqtraffic/const_mod.png",
+            map: map
+          });
+            marker.setTitle(title);
+            google.maps.event.addListener(marker,'click',function(e){
+                makeInfoWindow(position,info);
+                map.panTo(position);
+		        map.setZoom(15);
+                
+            });
+        }
+
+        function makeInfoWindow(position,msg)
+        {
+            if(infoWindow) infoWindow.close();
+
+            infoWindow = new google.maps.InfoWindow({
+                map:map,
+                position:position,
+                content: "<b>" + msg + "</b>"
+            });
+        }
+
+        function drawPolygons(paths,title)
+        {
+            var path = new google.maps.Polygon({
+                paths: paths,
+                strokeColor: '#FFF',
+                strokeOpacity: 0.8,
+                strokeWeight:2,
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                title:title
+            });
+            path.setMap(map);
+        }
+
+    </script>
+  <script src="js/main.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_fH3I26qAXuFMTTurkm_VG4VSugkvcds&libraries=places&callback=init"
+        async defer></script>
+  </body>
+</html>
