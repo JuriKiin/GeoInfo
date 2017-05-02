@@ -10,24 +10,7 @@
 <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Raleway:600,300" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script>
-window.twttr = (function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0],
-    t = window.twttr || {};
-  if (d.getElementById(id)) return t;
-  js = d.createElement(s);
-  js.id = id;
-  js.src = "https://platform.twitter.com/widgets.js";
-  fjs.parentNode.insertBefore(js, fjs);
 
-  t._e = [];
-  t.ready = function(f) {
-    t._e.push(f);
-  };
-
-  return t;
-}(document, "script", "twitter-wjs"));
-</script>
 </head>
 
 <body>
@@ -67,11 +50,13 @@ window.twttr = (function(d, s, id) {
             var input = document.getElementById('searchterm');
             var searchButton = document.getElementById('search');
             searchBox = new google.maps.places.SearchBox(input);
-            
-            searchBox.addListener('places_changed', function() {
+
+            function Search(){
+                console.log("click");
+                console.log(searchBox);
                 var places = searchBox.getPlaces();
 
-                if (places.length == 0) {
+                if (places == undefined || places.length == 0) {
                     return;
                 }
 
@@ -109,6 +94,22 @@ window.twttr = (function(d, s, id) {
                 var swLat =  map.getBounds().getSouthWest().lat();   
                 var swLon  =  map.getBounds().getSouthWest().lng();   
 
+                var eventURL = "https://app.ticketmaster.com/discovery/v2/events.json?"; 
+                eventURL += "apikey=o5do3BLMNQ0Ht7640KC3zdqqZpU8mbGk";
+                eventURL += "&latlong=" + (neLat + swLat)/2 + "," + (neLon + swLon)/2;
+                eventURL += "&unit=miles&radius=10";
+
+                $.ajax({
+                    type:"GET",
+                    url: eventURL,
+                    async: true,
+                    dataType: "json",
+                    success: getEvents,
+                    error: function(xhr, status, err){
+                        console.log("Error loading TicketMaster API");
+                    }
+                });
+
                 var url = "https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=";
                 url += neLat + ",";
                 url += neLon + ",";
@@ -122,8 +123,10 @@ window.twttr = (function(d, s, id) {
                     data: null,
                     success: getData
                 });
+            }
 
-            });
+            searchBox.addListener('places_changed', Search);
+            searchButton.onclick = Search;
         }
 
         function getData(obj)
@@ -174,20 +177,55 @@ window.twttr = (function(d, s, id) {
                 {
                     infoWindowInfo += "<p>This incident is not impacting traffic.</p>";
                 }
-                addMarker(incident.lat,incident.lng,"Incident",infoWindowInfo);
+                addMarker(incident.lat,incident.lng,"Incident",infoWindowInfo,"http://api.mqcdn.com/mqtraffic/const_mod.png");
 
                 
             }
         }
 
-        function addMarker(latitude,longitude,title,info)
+        //Gets all events in the area from the
+        //TicketMaster API
+        function getEvents(obj){
+            if(obj.error){
+                console.log("Error: No events found.");
+			    return;
+		    }
+            if(obj.total_items == 0){
+                console.log("No events found.");
+                return;
+		    }
+
+            //Show markers on the map
+            console.log(obj);
+            console.log(obj._embedded.events.length);
+            for(var i=0;i<obj._embedded.events.length;i++)
+            {
+                var event = obj._embedded.events[i];
+                console.log("loop");
+                //Create info window
+                var infoWindowInfo = "<h1>" + event.name + "</h1>";
+                infoWindowInfo += "<h3>" + event._embedded.venues[0].name + "</h3>";
+                infoWindowInfo += "<h3>" + event.dates.start.localDate + "</h3><hr>";
+                if(event.info){
+                    infoWindowInfo += "<p>" + event.info + "</p>";
+                }else{
+                    infoWindowInfo += "<p>No description available.</p>";
+                }
+                //infoWindowInfo += "<img src='" + event.images[event.images.length-1].url + "' alt='Event Image'/>";
+                infoWindowInfo += "<a href='" + event.url + "'>Purchase Tickets</a>";
+                addMarker(parseInt(event._embedded.venues[0].location.latitude),parseInt(event._embedded.venues[0].location.longitude),"Event",infoWindowInfo,"https://assets-beta.mapquestapi.com/icon/v2/marker-f76c5e-sm.png");
+            }
+        }
+
+        //Adds a marker to the map of an event
+        function addMarker(latitude,longitude,title,info,icon)
         {
             var position = {lat:latitude,lng:longitude};
             var marker = new google.maps.Marker({
-            position: position,
-            icon: "http://api.mqcdn.com/mqtraffic/const_mod.png",
-            map: map
-          });
+                position: position,
+                icon: icon,
+                map: map
+            });
             marker.setTitle(title);
             google.maps.event.addListener(marker,'click',function(e){
                 makeInfoWindow(position,info);
@@ -197,6 +235,7 @@ window.twttr = (function(d, s, id) {
             });
         }
 
+        //Makes an info window
         function makeInfoWindow(position,msg)
         {
             if(infoWindow) infoWindow.close();
