@@ -1,17 +1,38 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Geo Traffic</title>
+<title>Traffic Lite</title>
 <meta name="viewport" content="initial-scale=1.0">
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
 <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Raleway:600,300" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script>
+window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));
+</script>
 </head>
-  <body>
+
+<body>
     <div id="header">
-        <h1>Geo Traffic</h1>
+        <h1><b>Traffic</b> Lite</h1>
     </div>
     <h1 id="help">Need Help?</h1>
 
@@ -205,5 +226,5 @@
   <script src="js/main.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_fH3I26qAXuFMTTurkm_VG4VSugkvcds&libraries=places&callback=init"
         async defer></script>
-  </body>
+</body>
 </html>
