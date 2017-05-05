@@ -2,15 +2,19 @@
 <html>
 
 <head>
-<title>Traffic Lite</title>
-<meta name="viewport" content="initial-scale=1.0">
-<meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="css/stylesheet.css">
-<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Raleway:600,300" rel="stylesheet">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <title>Traffic Lite</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
 
+    <!-- Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
+    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:600,300" rel="stylesheet">
+    <link type="text/css" href="css/pretty.css" rel="stylesheet">
+
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 </head>
 
 <body>
@@ -19,16 +23,64 @@
     </div>
     <h1 id="help">Need Help?</h1>
 
-	<input id="searchterm" type="text" placeholder="Where are you?" />
+	<input id="searchterm" type="text" placeholder="Where are you going?" />
     <button type="button" id="search">Go!</button>
-    <p id='direction'>Enter a location to view traffic information</p>
 
-
+    <div id="checkbox">
+        <div class="pretty info circle a-jelly">
+            <input type="checkbox" id="incidents">
+            <label><i class = "mdi mdi-check"> </i> Incidents</label><br>
+        </div>
+        <div class="pretty info circle a-bounce">
+            <input type="checkbox" id="events">
+            <label><i class = "mdi mdi-check"> </i> Events</label>
+        </div>
+    </div>
     <div id="map"></div>
 
     <div id="content">
         <h1>What is this?</h1>
+        <div id="columns">
+            <div class="col">
+                <h2>Avoid Accidents and Construction</h1>
+                <p>
+                    Get up-to-date traffic information showing
+                    you construction and accidents in your area so
+                    you can plan ahead and take the best route.
+                    More text to fill space.
+                </p>
+            </div>
+            <div class="col">
+                <h2>Find Concerts and Events Near You</h1>
+                <p>
+                    Plan a night on the town with events near you. See a variety
+                    of local events, concerts, comedy shows and more and purchase tickets directly
+                    from TicketMaster.
+                </p>
+            </div>
+            <div class="col">
+                <h2>Third Title</h1>
+                <p>
+                    Blah Blah Blah Blah Blah Blah Blah Blah 
+                    Blah Blah Blah Blah Blah Blah Blah Blah 
+                    Blah Blah Blah Blah Blah Blah Blah Blah 
+                    Blah Blah Blah Blah Blah Blah Blah Blah 
+                    Blah Blah Blah Blah Blah Blah Blah 
+                </p>
+            </div>
+        </div>
     </div>
+
+    <div id="popup">
+        <p id= "close">&times</p>
+        <h1>Help</h1>
+        <p>
+            Type in a location to find nearby events and receive up-to-date
+            traffic information so you can avoid accidents and construction.
+        </p>
+    </div>
+
+    <footer>&copy 2017 Nikolas Whiteside and Juri Kiin</footer>
 
     <script>
         var map;
@@ -38,6 +90,20 @@
 
         function init() 
         {
+            //Initialize popup
+            var popTemp = document.getElementById("popup");
+            document.getElementById("help").onclick = function(){
+                if(popTemp.style.display == "none"){
+                    popTemp.style.display = "block";
+                }else{
+                    popTemp.style.display = "none";
+                }
+            }
+            document.getElementById("close").onclick = function(){
+                popTemp.style.display = "none";
+            }
+            popTemp.style.display = "none";
+
             //Initalize the map
             var mapOptions = {
                 center: {lat:39.828127,lng:-98.579404},
@@ -97,7 +163,7 @@
                 var eventURL = "https://app.ticketmaster.com/discovery/v2/events.json?"; 
                 eventURL += "apikey=o5do3BLMNQ0Ht7640KC3zdqqZpU8mbGk";
                 eventURL += "&latlong=" + (neLat + swLat)/2 + "," + (neLon + swLon)/2;
-                eventURL += "&unit=miles&radius=10";
+                eventURL += "&unit=miles&radius=70&size=100";
 
                 $.ajax({
                     type:"GET",
@@ -152,7 +218,7 @@
                 switch(incident.type)
                 {
                     case 1:
-                        infoWindowInfo += "Constuction";
+                        infoWindowInfo += "Construction";
                         break;
                     case 2:
                         infoWindowInfo += "Event";
@@ -186,13 +252,13 @@
         //Gets all events in the area from the
         //TicketMaster API
         function getEvents(obj){
+            if(obj._embedded == undefined){
+                console.log("No events found.");
+                return;
+		    }
             if(obj.error){
                 console.log("Error: No events found.");
 			    return;
-		    }
-            if(obj.total_items == 0){
-                console.log("No events found.");
-                return;
 		    }
 
             //Show markers on the map
@@ -201,7 +267,6 @@
             for(var i=0;i<obj._embedded.events.length;i++)
             {
                 var event = obj._embedded.events[i];
-                console.log("loop");
                 //Create info window
                 var infoWindowInfo = "<h1>" + event.name + "</h1>";
                 infoWindowInfo += "<h3>" + event._embedded.venues[0].name + "</h3>";
@@ -213,7 +278,7 @@
                 }
                 //infoWindowInfo += "<img src='" + event.images[event.images.length-1].url + "' alt='Event Image'/>";
                 infoWindowInfo += "<a href='" + event.url + "'>Purchase Tickets</a>";
-                addMarker(parseInt(event._embedded.venues[0].location.latitude),parseInt(event._embedded.venues[0].location.longitude),"Event",infoWindowInfo,"https://assets-beta.mapquestapi.com/icon/v2/marker-f76c5e-sm.png");
+                addMarker(parseFloat(event._embedded.venues[0].location.latitude),parseFloat(event._embedded.venues[0].location.longitude),"Event",infoWindowInfo,"https://assets-beta.mapquestapi.com/icon/v2/marker-f76c5e-sm.png");
             }
         }
 
@@ -230,7 +295,6 @@
             google.maps.event.addListener(marker,'click',function(e){
                 makeInfoWindow(position,info);
                 map.panTo(position);
-		        map.setZoom(15);
                 
             });
         }

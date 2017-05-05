@@ -50,7 +50,17 @@ button:hover{
 button:active{
     background-color: #c15247;
 }
-
+#checkbox{
+    position: absolute;
+    z-index: 3;
+    left: 5px;
+    top: 37%;
+    background-color: rgba(246,142,95,0.5);
+    border: solid 1px #F68E5F;
+    padding: 10px;
+    font-size: 20px;
+    font-family: 'Raleway', sans-serif;
+}
 #content{
     margin-top:18%;
     height:80vh;
@@ -80,4 +90,70 @@ button:active{
 #help:hover{
     color:rgba(255,255,255,.5);
     cursor:pointer;
+    transition: color 0.5s;
+}
+
+/* Column Styles */
+#columns{
+    text-align: center;
+}
+.col{
+    position: relative;
+    display: inline-block;
+    top: 0;
+    width: 30%;
+    height: 400px;
+    background-color: white;
+    margin: 1%;
+    text-align: center;
+}
+
+.col h2{
+    color: #324376;
+    font-family: 'Raleway', sans-serif;
+}
+
+.col p{
+    font-family: 'Open Sans', sans-serif;
+    font-size: 20px;
+    padding-left: 35px;
+    padding-right: 35px;
+    text-align: left;
+}
+
+/* Footer */
+footer{
+    text-align: center;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Pop-up Styles */
+#popup{
+    position: fixed;
+    width: 40%;
+    left: 30%;
+    top: 35%;
+    height: 30%;
+    background-color: rgba(246,142,95,0.9);
+    padding:0;
+    text-align: center;
+    font-family: 'Raleway', sans-serif;
+}
+
+#close{
+    position: absolute;
+    right: 5px;
+    top: 0px;
+    line-height:0;
+    padding:0;
+    margin:0;
+    margin-top:8px;
+    font-size: 30px;
+}
+
+#close:hover{
+    cursor: pointer;
+    color: white;
+    transition: color 0.5s;
 }
