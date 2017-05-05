@@ -20,8 +20,9 @@
 <body>
     <div id="header">
         <h1><b>Traffic</b> Lite</h1>
+        <h2 id="help">Need Help?</h2>
     </div>
-    <h1 id="help">Need Help?</h1>
+    
 
 	<input id="searchterm" type="text" placeholder="Where are you going?" />
     <button type="button" id="search">Go!</button>
@@ -37,6 +38,10 @@
         </div>
     </div>
     <div id="map"></div>
+
+    <div id="eventDiv">
+    </div>
+    <div id="incidentDiv"></div>
 
     <div id="content">
         <h1>What is this?</h1>
@@ -73,7 +78,7 @@
 
     <div id="popup">
         <p id= "close">&times</p>
-        <h1>Help</h1>
+        <h1>Help:</h1><hr>
         <p>
             Type in a location to find nearby events and receive up-to-date
             traffic information so you can avoid accidents and construction.
@@ -120,6 +125,10 @@
             function Search(){
                 console.log("click");
                 console.log(searchBox);
+
+                document.getElementById('incidentDiv').innerHTML = "";
+                document.getElementById('eventDiv').innerHTML = "";
+
                 var places = searchBox.getPlaces();
 
                 if (places == undefined || places.length == 0) {
@@ -206,6 +215,8 @@
                 return; // Bail out
 		    }
 
+            var incidentDiv = document.getElementById('incidentDiv');
+
             //Show markers on the map
             console.log(obj);
             for(var i=0;i<obj.incidents.length;i++)
@@ -214,23 +225,23 @@
 
                 //Create info window
                 var infoWindowInfo = "<h1>";
-
+                var incidentTitle;
                 switch(incident.type)
                 {
                     case 1:
-                        infoWindowInfo += "Construction";
+                        incidentTitle = "Construction";
                         break;
                     case 2:
-                        infoWindowInfo += "Event";
+                        incidentTitle = "Event";
                         break;
                     case 3:
-                        infoWindowInfo += "Congestion/Flow";
+                        incidentTitle = "Congestion/Flow";
                         break;
                     case 4:
-                        infoWindowInfo += "Incident/Accident";
+                        incidentTitle = "Accident";
                         break;
                 }
-                
+                infoWindowInfo += incidentTitle;
                 infoWindowInfo += "</h1>"
                 infoWindowInfo += "<h3>" + incident.startTime + " -- " + incident.endTime + "</h3>";
                 infoWindowInfo += "<p>" + incident.fullDesc + "</p><hr>";
@@ -246,6 +257,23 @@
                 addMarker(incident.lat,incident.lng,"Incident",infoWindowInfo,"http://api.mqcdn.com/mqtraffic/const_mod.png");
 
                 
+                //Add data to the indicentsDiv
+                var divString;
+                divString += "<div class='incident'>";
+                divString += "<h1>" + incidentTitle + "</h1>";
+                divString += "<h3>" + incident.startTime + " -- " + incident.endTime + "</h3>";
+                divString += "<p>" + incident.fullDesc + "</p><hr>";
+                divString += "<h3>Incident Severity: " + incident.severity + "/4</h3>";
+                if(incident.impacting)
+                {
+                    divString += "<p>This incident is impacting traffic.</p>";
+                }
+                else
+                {
+                    divString += "<p>This incident is not impacting traffic.</p>";
+                }
+                divString += "</div>";
+                incidentDiv.innerHTML += divString;
             }
         }
 
