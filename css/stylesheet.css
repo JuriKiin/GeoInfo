@@ -23,35 +23,17 @@ html, body {
 
 #searchterm{
     font-size: 35px;
-    width:48%;
+    width:40%;
     height:50px;
-    margin-left:20%;
-    margin-top:8%;
+    margin-left:30%;
     font-family: 'Open Sans', sans-serif;
     padding-left: 20px;
-}
-button{
-    background-color: #F76C5E;
-    border:none;
-    color:white;
-    padding: 0 32px 0 32px;
-
-    width:10%;
-    height: 56px;
-    font-size: 20px;
-    font-family: 'Oswald', sans-serif;
-}
-button:hover{
-    cursor: pointer;
-}
-button:active{
-    background-color: #c15247;
 }
 #checkbox{
     z-index: 3;
     left: 10px;
-    width:20%;
-    margin-top:70px;
+    width:auto;
+    margin-top:85px;
     position:absolute;
     background-color: rgba(246,142,95,0.5);
     border: solid 1px #F68E5F;
@@ -60,7 +42,6 @@ button:active{
     font-family: 'Raleway', sans-serif;
 }
 #content{
-    margin-top:18%;
     height:80vh;
 }
 #content h1{
