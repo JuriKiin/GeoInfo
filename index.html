@@ -65,13 +65,13 @@
                 </p>
             </div>
             <div class="col">
-                <h2>Third Title</h1>
+                <h2>Your Location</h1>
                 <p>
                     Blah Blah Blah Blah Blah Blah Blah Blah 
                     Blah Blah Blah Blah Blah Blah Blah Blah 
                     Blah Blah Blah Blah Blah Blah Blah Blah 
                     Blah Blah Blah Blah Blah Blah Blah Blah 
-                    Blah Blah Blah Blah Blah Blah Blah 
+
                 </p>
             </div>
         </div>
@@ -119,9 +119,11 @@
             document.getElementById("location").onclick = function(){
                 if("geolocation" in navigator){
                     navigator.geolocation.getCurrentPosition(function(position){
-                        var myLoc = new google.maps.LatLng(position.coords.latitude, position.coords.lotitude);
+                        var myLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                         map.setCenter(myLoc);
-                        input.value = position.coords.latitude;
+                        map.setZoom(16);
+                        addMarker(position.coords.latitude,position.coords.longitude,"My Location","My Location","https://assets-beta.mapquestapi.com/icon/v2/marker-f76c5e-sm.png");
+                       // input.value = position.coords.latitude;
                     });
                 }
             }

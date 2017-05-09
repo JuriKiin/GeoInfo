@@ -26,7 +26,7 @@ html, body {
     width:48%;
     height:50px;
     margin-left:20%;
-    margin-top:10%;
+    margin-top:8%;
     font-family: 'Open Sans', sans-serif;
     padding-left: 20px;
 }
@@ -34,7 +34,8 @@ button{
     background-color: #F76C5E;
     border:none;
     color:white;
-    padding:0px 32px;
+    padding: 0 32px 0 32px;
+
     width:10%;
     height: 56px;
     font-size: 20px;
@@ -48,7 +49,7 @@ button:active{
 }
 #checkbox{
     z-index: 3;
-    left: 5px;
+    left: 10px;
     width:20%;
     margin-top:70px;
     position:absolute;
@@ -100,7 +101,6 @@ hr{
 .col{
     position: relative;
     display: inline-block;
-    top: 0;
     width: 30%;
     height: 400px;
     background-color: white;
@@ -165,4 +165,16 @@ footer{
     float:left;
     width: 25%;
     height: 75px;
+}
+#location{
+    display:inline;
+    margin-left: 20px;
+    color:rgba(255,255,255,.2);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 20px;
+}
+#location:hover{
+    color:rgba(255,255,255,.5);
+    cursor:pointer;
+    transition: color 0.5s;
 }
