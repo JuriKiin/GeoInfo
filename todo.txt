@@ -1,8 +1,5 @@
 TODO:
 
-- Implement Twitter API to display tweets from nearby areas of incidents
-- Check checklist
-- Add about / Help information-display.
-
-
-- Get Search button working.
+- Get search button working
+- Implement geolocation technology
+- Flesh out page content

@@ -20,6 +20,7 @@
 <body>
     <div id="header">
         <h1><b>Traffic</b> Lite</h1>
+        <h2 id="location">Around Me</h2>
         <h2 id="help">Need Help?</h2>
     </div>
     
@@ -78,7 +79,7 @@
 
     <div id="popup">
         <p id= "close">&times</p>
-        <h1>Help:</h1><hr>
+        <h1>Help</h1>
         <p>
             Type in a location to find nearby events and receive up-to-date
             traffic information so you can avoid accidents and construction.
@@ -109,21 +110,35 @@
             }
             popTemp.style.display = "none";
 
-            //Initalize the map
-            var mapOptions = {
-                center: {lat:39.828127,lng:-98.579404},
-			    zoom:4,
-                streetViewControl:false,
-                mapTypeControl:false
-            };
-            map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
+            //Set up the search box
             var input = document.getElementById('searchterm');
             var searchButton = document.getElementById('search');
             searchBox = new google.maps.places.SearchBox(input);
 
+            //Set up geolocation button
+            document.getElementById("location").onclick = function(){
+                if("geolocation" in navigator){
+                    navigator.geolocation.getCurrentPosition(function(position){
+                        var myLoc = new google.maps.LatLng(position.coords.latitude, position.coords.lotitude);
+                        map.setCenter(myLoc);
+                        input.value = position.coords.latitude;
+                    });
+                }
+            }
+
+            //Initialize the map
+            var mapOptions = {
+                center: {lat: 39.828127,lng: -98.579404},
+                zoom: 4,
+                streetViewControl:false,
+                mapTypeControl:false
+            };
+
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
             function Search(){
                 console.log("click");
+                
                 console.log(searchBox);
 
                 document.getElementById('incidentDiv').innerHTML = "";
