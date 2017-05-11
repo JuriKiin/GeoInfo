@@ -20,12 +20,12 @@
 <body>
     <div id="header">
         <h1><b>Traffic</b> <span style="color:#F76C5E">Lite</span></h1>
-        <h2 id="location">Around Me</h2>
-        <h2 id="help">Need Help?</h2>
+	    <input id="searchterm" type="text" placeholder="Where are you going?" />
+        <nav>
+            <li id="location">Around Me</li>
+            <li id="help">Help</li>
+        </nav>
     </div>
-    
-
-	<input id="searchterm" type="text" placeholder="Where are you going?" />
 
     <div id="checkbox">
             <input type="checkbox" id="incidents" checked>
@@ -33,10 +33,11 @@
             <input type="checkbox" id="events" checked>
             <label>Events</label>
     </div>
+    
     <div id="map"></div>
 
     <div id="content">
-        <h1><u>What is this?</u></h1>
+        <h1>What is this?</h1>
         <div id="columns">
             <div class="col">
                 <h2>Avoid Accidents and Construction</h1>
@@ -56,13 +57,12 @@
                 </p>
             </div>
             <div class="col">
-                <h2>Your Location</h1>
+                <h2>Quick and to the Point</h1>
                 <p>
-                    Blah Blah Blah Blah Blah Blah Blah Blah 
-                    Blah Blah Blah Blah Blah Blah Blah Blah 
-                    Blah Blah Blah Blah Blah Blah Blah Blah 
-                    Blah Blah Blah Blah Blah Blah Blah Blah 
-
+                    Get quick access to the information you
+                    want by using your geolocation to find
+                    all accidents and events near you with links
+                    to give you direct access to the ticket sellers.
                 </p>
             </div>
         </div>
@@ -74,6 +74,10 @@
         <p>
             Type in a location to find nearby events and receive up-to-date
             traffic information so you can avoid accidents and construction.
+            Incidents are categorized as accidents, construction, congestion
+            and other events. Event tickets are available through TicketMaster
+            and will redirect you to the purchase site. You can use the checkbox
+            below to filter through indicents and events.
         </p>
     </div>
 

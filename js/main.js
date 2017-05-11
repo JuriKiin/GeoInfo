@@ -17,7 +17,7 @@
                     popTemp.style.display = "none";
                 }
             }
-            document.getElementById("close").onchange = function(){
+            document.getElementById("close").onclick = function(){
                 popTemp.style.display = "none";
             }
 
@@ -51,9 +51,44 @@
                         var myLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                         map.setCenter(myLoc);
                         map.setZoom(10);
-                        addMarker(position.coords.latitude,position.coords.longitude,"My Location","My Location","https://assets-beta.mapquestapi.com/icon/v2/marker-f76c5e-sm.png",1);
-                       // input.value = position.coords.latitude;
-                       Search();
+                        addMarker(position.coords.latitude,position.coords.longitude,"My Location","My Location","media/LocationPin.png",1);
+                       
+                       //Search for events in the area
+                       var eventURL = "https://app.ticketmaster.com/discovery/v2/events.json?"; 
+                        eventURL += "apikey=o5do3BLMNQ0Ht7640KC3zdqqZpU8mbGk";
+                        eventURL += "&latlong=" + position.coords.latitude + "," + position.coords.longitude;
+                        eventURL += "&unit=miles&radius=70&size=100";
+
+                        $.ajax({
+                            type:"GET",
+                            url: eventURL,
+                            async: true,
+                            dataType: "json",
+                            success: getEvents,
+                            error: function(xhr, status, err){
+                                console.log("Error loading TicketMaster API");
+                            }
+                        });
+
+                        //Search for traffic incidents in the area
+                        var neLat =  map.getBounds().getNorthEast().lat();   
+                        var neLon  =  map.getBounds().getNorthEast().lng();
+                        var swLat =  map.getBounds().getSouthWest().lat();   
+                        var swLon  =  map.getBounds().getSouthWest().lng();   
+
+                        var url = "https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=";
+                        url += neLat + ",";
+                        url += neLon + ",";
+                        url += swLat + ",";
+                        url += swLon + ",";
+                        url += "&key=i912Q0XOu1RVSVuyrZims6hfTFJV9dBu&filters=construction,incidents,event,congestion";
+
+                        $.ajax({
+                            dataType: "jsonp",
+                            url: url,
+                            data: null,
+                            success: getData
+                        });
                     });
                 }
             }
@@ -69,17 +104,13 @@
             map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
             function Search(){
-                console.log("click");
                 
                 console.log(searchBox);
 
-                document.getElementById('incidentDiv').innerHTML = "";
-                document.getElementById('eventDiv').innerHTML = "";
-
                 var places = searchBox.getPlaces();
+                console.log(places);
 
                 if (places == undefined || places.length == 0) {
-                    console.log("Its fucking broken");
                     return;
                 }
 
@@ -133,7 +164,7 @@
                 url += neLon + ",";
                 url += swLat + ",";
                 url += swLon + ",";
-                url += "&key=i912Q0XOu1RVSVuyrZims6hfTFJV9dBu&filters=construction,incidents";
+                url += "&key=i912Q0XOu1RVSVuyrZims6hfTFJV9dBu&filters=construction,incidents,event,congestion";
 
                 $.ajax({
                     dataType: "jsonp",
@@ -196,27 +227,7 @@
                 {
                     infoWindowInfo += "<p>This incident is not impacting traffic.</p>";
                 }
-                addMarker(incident.lat,incident.lng,"Incident",infoWindowInfo,"http://api.mqcdn.com/mqtraffic/const_mod.png",2);
-
-                /*
-                //Add data to the indicentsDiv
-                var divString;
-                divString += "<div class='incident'>";
-                divString += "<h1>" + incidentTitle + "</h1>";
-                divString += "<h3>" + incident.startTime + " -- " + incident.endTime + "</h3>";
-                divString += "<p>" + incident.fullDesc + "</p><hr>";
-                divString += "<h3>Incident Severity: " + incident.severity + "/4</h3>";
-                if(incident.impacting)
-                {
-                    divString += "<p>This incident is impacting traffic.</p>";
-                }
-                else
-                {
-                    divString += "<p>This incident is not impacting traffic.</p>";
-                }
-                divString += "</div>";
-                incidentDiv.innerHTML += divString;
-                */
+                addMarker(incident.lat,incident.lng,"Incident",infoWindowInfo,"media/WarningPin.png"/*"http://api.mqcdn.com/mqtraffic/const_mod.png"*/,2);
             }
         }
 
@@ -247,9 +258,8 @@
                 }else{
                     infoWindowInfo += "<p>No description available.</p>";
                 }
-                //infoWindowInfo += "<img src='" + event.images[event.images.length-1].url + "' alt='Event Image'/>";
                 infoWindowInfo += "<a href='" + event.url + "'>Purchase Tickets</a>";
-                addMarker(parseFloat(event._embedded.venues[0].location.latitude),parseFloat(event._embedded.venues[0].location.longitude),"Event",infoWindowInfo,"https://assets-beta.mapquestapi.com/icon/v2/marker-f76c5e-sm.png",3);
+                addMarker(parseFloat(event._embedded.venues[0].location.latitude),parseFloat(event._embedded.venues[0].location.longitude),"Event",infoWindowInfo,"media/EventPin.png",3);
             }
         }
 
